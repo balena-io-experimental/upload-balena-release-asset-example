@@ -1,0 +1,40 @@
+---
+name: package and draft GitHub release
+description: Example of how to use upload-balena-release-asset action
+
+inputs:
+  json:
+    description: 'JSON stringified object containing all the inputs from the calling workflow'
+    required: true
+  secrets:
+    description: 'JSON stringified object containing all the secrets from the calling workflow'
+    required: true
+  variables:
+    description: 'JSON stringified object containing all the variables from the calling workflow'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download balenaCLI
+      uses: balena-io-examples/setup-balena-action@main
+      with:
+        balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
+
+    - name: Download balenaOS image
+      shell: bash
+      run: |
+        balena -v
+        balena whoami
+        balena os download generic-amd64 -o image.img
+
+    - name: Upload release asset
+      uses: balena-io-examples/upload-balena-release-asset@main
+      with:
+        balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
+        release-id: 171635
+        asset-key: 'balenaostest'
+        file-path: 'image.img'
+        overwrite: true
+        balena-host: 'balena-staging.com'
+        if-file-path-not-found: 'error'
