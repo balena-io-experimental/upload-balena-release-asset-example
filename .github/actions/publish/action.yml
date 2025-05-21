@@ -1,5 +1,5 @@
 ---
-name: package and draft GitHub release
+name: Download balenaOS and upload as a release asset
 description: Example of how to use upload-balena-release-asset action
 
 inputs:
@@ -19,7 +19,7 @@ runs:
     - name: Download balenaCLI
       uses: balena-io-examples/setup-balena-action@main
       with:
-        balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
+        balena-token: ${{ fromJSON(inputs.secrets).BALENA_API_KEY }}
 
     - name: Download balenaOS image
       shell: bash
@@ -29,7 +29,7 @@ runs:
         balena os download generic-amd64 -o image.img
 
     - name: Upload release asset
-      uses: balena-io-examples/upload-balena-release-asset@main
+      uses: balena-io/upload-balena-release-asset@741707eee3716304a1ac13d41d60d166b3e5bdeb
       with:
         balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
         release-id: 171635
