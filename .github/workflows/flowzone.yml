@@ -24,3 +24,14 @@ jobs:
       )
 
     secrets: inherit
+    with:
+      custom_publish_matrix: >
+        {
+          "os": [
+            ["ubuntu-latest"],
+            ["windows-latest"],
+            ["macos-13"],
+            ["self-hosted", "X64"],
+            ["self-hosted", "ARM64"],
+          ]
+        }

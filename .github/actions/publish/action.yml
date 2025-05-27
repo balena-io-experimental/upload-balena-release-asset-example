@@ -1,5 +1,5 @@
 ---
-name: package and draft GitHub release
+name: Download balenaOS and upload as a release asset
 description: Example of how to use upload-balena-release-asset action
 
 inputs:
@@ -19,7 +19,7 @@ runs:
     - name: Download balenaCLI
       uses: balena-io-examples/setup-balena-action@main
       with:
-        balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
+        balena-token: ${{ fromJSON(inputs.secrets).BALENA_API_KEY }}
 
     - name: Download balenaOS image
       shell: bash
@@ -27,14 +27,26 @@ runs:
         balena -v
         balena whoami
         balena os download generic-amd64 -o image.img
+        mkdir test
+        echo "file" > test/file.txt
+        echo "toexclude" > test/exclude.txt
+        mkdir test/subdir
+        echo "subdirfile" > test/subdir/subdirfile.txt
 
     - name: Upload release asset
-      uses: balena-io-examples/upload-balena-release-asset@main
+      uses: balena-io/upload-balena-release-asset@88be4cb07938208f6b171428b0a2aac6aa12c9bf
+      id: upload
       with:
         balena-token: ${{ fromJSON(inputs.secrets).STAGING_API_KEY }}
         release-id: 171635
-        asset-key: 'balenaostest'
-        file-path: 'image.img'
+        path: |
+          ./
+          !test/exclude.txt
         overwrite: true
         balena-host: 'balena-staging.com'
         if-file-path-not-found: 'error'
+
+    - name: assert upload
+      shell: bash
+      run: |
+        echo "Upload result: ${{ steps.upload.outputs.release-assets }}"
